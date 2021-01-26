@@ -23,9 +23,11 @@ class Task:
         return TaskResult(self.name, parsed_value, status)
 
     def is_valid(self, value):
+        # overwrite this to add custom validation
         return value is not None or bool(value)
 
     def process_value(self, value):
+        # overwrite this to process the value returned by task
         return value
 
     def __str__(self):
@@ -79,10 +81,12 @@ class Pipeline:
         if not len(self._task_queue):
             raise PipelineSetupError('No tasks to run.')
 
+        summary = []
         for task in self._task_queue:
             result = task.run()
+            if result:
+                summary.append(result.value)
             print(result)
-            # if not result:
-            #     return result
+        return summary
 
 

@@ -33,4 +33,4 @@ class PokeApi:
         return os.listdir('.')
 
 
-pipeline.run()
+print(pipeline.run())
