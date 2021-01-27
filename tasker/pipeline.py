@@ -1,10 +1,6 @@
 from .tasks import Task
 
 
-class PipelineSetupError(Exception):
-    pass
-
-
 class Pipeline:
     def __init__(self):
         self._host_instance = None
@@ -49,3 +45,5 @@ class Pipeline:
         return summary
 
 
+class PipelineSetupError(Exception):
+    pass
