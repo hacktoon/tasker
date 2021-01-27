@@ -7,20 +7,16 @@ class PipelineSetupError(Exception):
 
 
 class Task:
-    def __init__(self, name, function, params={}):
+    def __init__(self, name, function):
         self.name = name
         self.function = function
 
-    def run(self):
-        status = True
-        try:
-            value = self.function()
-            status = self.is_valid(value)
-        except Exception as err:
-            status = False
-            value = str(err)
-        parsed_value = self.process_value(value)
-        return TaskResult(self.name, parsed_value, status)
+    def run(self, previous=None):
+        value = self.function(previous)
+        status = self.is_valid(value)
+        if status:
+            value = self.process_value(value)
+        return TaskResult(self.name, value, status)
 
     def is_valid(self, value):
         # overwrite this to add custom validation
@@ -50,42 +46,44 @@ class TaskResult:
 
 class Pipeline:
     def __init__(self):
-        self._worker_obj = None
+        self._host_instance = None
         self._basetask = Task
         self._task_queue = []
 
     def setup(self, basetask=Task):
         self._basetask = basetask
 
-        def decorator(worker_cls):
+        def decorator(HostClass):
             # create instance of class with tasks
-            self._worker_obj = worker_cls()
+            self._host_instance = HostClass()
         return decorator
 
     def task(self, name='Unknown', basetask=None):
         TaskClass = basetask or self._basetask
 
         def decorator(original_method):
-            def decorated_method():
-                if not self._worker_obj:
+            def decorated_method(previous):
+                if not self._host_instance:
                     raise PipelineSetupError('No pipeline configured.')
-                return original_method(self._worker_obj)
+                return original_method(self._host_instance, previous)
             _task = TaskClass(name, decorated_method)
             self._task_queue.append(_task)
             return decorated_method
         return decorator
 
     def run(self):
-        if not self._worker_obj:
-            raise PipelineSetupError('No pipeline configured.')
+        if not self._host_instance:
+            raise PipelineSetupError('No pipeline setup.')
         if not len(self._task_queue):
             raise PipelineSetupError('No tasks to run.')
 
         summary = []
+        previous_result = None
         for task in self._task_queue:
-            result = task.run()
+            result = task.run(previous_result)
             if result:
                 summary.append(result.value)
+            previous_result = result
             print(result)
         return summary
 
