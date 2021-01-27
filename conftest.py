@@ -28,6 +28,24 @@ def good_pokeapi():
         @pipeline.task(name="GET Pikachu")
         def pikachu(self, prev_result):
             return self.client.get('pokemon/pikachu')
+    return pipeline
+
+
+@pytest.fixture(scope='session')
+def good_fsapi():
+    pipeline = Pipeline()
+    @pipeline.setup(basetask=HTTPTask)
+    class GoodPokeApi:
+        def __init__(self):
+            self.client = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
+
+        @pipeline.task(name="GET Ditto")
+        def ditto(self, prev_result):
+            return self.client.get(f'pokemon/ditto')
+
+        @pipeline.task(name="GET Pikachu")
+        def pikachu(self, prev_result):
+            return self.client.get('pokemon/pikachu')
 
         @pipeline.task(basetask=Task)
         def read_disc(self, prev_result):
