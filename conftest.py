@@ -19,16 +19,16 @@ def good_pokeapi():
     @pipeline.setup(basetask=HTTPTask)
     class GoodPokeApi:
         def __init__(self, *args, **kwargs):
-            self.client = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
+            self.http = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
             print(args, kwargs)
 
         @pipeline.task(name="GET Ditto")
         def ditto(self, prev_result):
-            return self.client.get(f'pokemon/ditto')
+            return self.http.get(f'pokemon/ditto')
 
         @pipeline.task(name="GET Pikachu")
         def pikachu(self, prev_result):
-            return self.client.get('pokemon/pikachu')
+            return self.http.get('pokemon/pikachu')
     return pipeline
 
 
@@ -38,15 +38,15 @@ def bad_pokeapi():
     @pipeline.setup(basetask=HTTPTask)
     class BadPokeApi:
         def __init__(self):
-            self.client = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
+            self.http = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
 
         @pipeline.task(name="GET Ditto")
         def ditto(self, prev_result):
-            return self.client.get(f'pokemon/ditto')
+            return self.http.get(f'pokemon/ditto')
 
         @pipeline.task(name="GET wrong URL")
         def pikachu(self, prev_result):
-            return self.client.get('pokemon/p')
+            return self.http.get('pokemon/p')
 
         @pipeline.task(basetask=Task)
         def read_disc(self, prev_result):
