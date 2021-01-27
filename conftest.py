@@ -1,13 +1,13 @@
 import pytest
-import requests
 import os
+from tasker.lib.http import HTTPClient
 from tasker.pipeline import Pipeline
 from tasker.tasks import Task
 
 
 class HTTPTask(Task):
     def is_valid(self, response):
-        return response.status_code < 400
+        return response.valid
 
     def process_value(self, response):
         return response.url
@@ -19,17 +19,15 @@ def good_pokeapi():
     @pipeline.setup(basetask=HTTPTask)
     class GoodPokeApi:
         def __init__(self):
-            self.default = 'ditto'
+            self.client = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
 
         @pipeline.task(name="GET Ditto")
         def ditto(self, prev_result):
-            url = f'https://pokeapi.co/api/v2/pokemon/{self.default}'
-            return requests.get(url)
+            return self.client.get(f'pokemon/ditto')
 
         @pipeline.task(name="GET Pikachu")
         def pikachu(self, prev_result):
-            url = f'https://pokeapi.co/api/v2/pokemon/pikachu'
-            return requests.get(url)
+            return self.client.get('pokemon/pikachu')
 
         @pipeline.task(basetask=Task)
         def read_disc(self, prev_result):
