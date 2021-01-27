@@ -2,8 +2,9 @@ from .tasks import Task
 
 
 class Pipeline:
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self._host_instance = None
+        self._host_params = (args, kwargs)
         self._basetask = Task
         self._task_queue = []
 
@@ -12,7 +13,8 @@ class Pipeline:
 
         def decorator(HostClass):
             # create instance of class with tasks
-            self._host_instance = HostClass()
+            args, kwargs = self._host_params
+            self._host_instance = HostClass(*args, **kwargs)
         return decorator
 
     def task(self, name='Unknown', basetask=None):

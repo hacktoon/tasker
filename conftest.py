@@ -18,8 +18,9 @@ def good_pokeapi():
     pipeline = Pipeline()
     @pipeline.setup(basetask=HTTPTask)
     class GoodPokeApi:
-        def __init__(self):
+        def __init__(self, *args, **kwargs):
             self.client = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
+            print(args, kwargs)
 
         @pipeline.task(name="GET Ditto")
         def ditto(self, prev_result):
