@@ -7,12 +7,12 @@ class PipelineSetupError(Exception):
 
 
 class Task:
-    def __init__(self, name, function):
+    def __init__(self, name, host_method):
         self.name = name
-        self.function = function
+        self.host_method = host_method
 
-    def run(self, previous=None):
-        value = self.function(previous)
+    def run(self, prev_result=None):
+        value = self.host_method(prev_result)
         status = self.is_valid(value)
         if status:
             value = self.process_value(value)
@@ -61,11 +61,11 @@ class Pipeline:
     def task(self, name='Unknown', basetask=None):
         TaskClass = basetask or self._basetask
 
-        def decorator(original_method):
-            def decorated_method(previous):
+        def decorator(host_method):
+            def decorated_method(prev_result):
                 if not self._host_instance:
                     raise PipelineSetupError('No pipeline configured.')
-                return original_method(self._host_instance, previous)
+                return host_method(self._host_instance, prev_result)
             _task = TaskClass(name, decorated_method)
             self._task_queue.append(_task)
             return decorated_method

@@ -18,21 +18,20 @@ class PokeApi:
         self.default = 'ditto'
 
     @pipeline.task(name="GET Ditto")
-    def ditto(self, previous):
+    def ditto(self, prev_result):
         url = f'https://pokeapi.co/api/v2/pokemon/{self.default}'
-        print(f'prev: {previous}')
         return requests.get(url)
 
     @pipeline.task(name="GET Pikachu")
-    def pikachu(self, previous):
+    def pikachu(self, prev_result):
         url = f'https://pokeapi.co/api/v2/pokemon/pikachu'
-        print(f'prev: {previous}')
         return requests.get(url)
 
     @pipeline.task(basetask=Task)
-    def read_disc(self, previous):
-        print(f'prev: {previous}')
+    def read_disc(self, prev_result):
         return os.listdir('.')
 
 
-print(pipeline.run())
+def test_run():
+    results = pipeline.run()
+    assert len(results) == 3
