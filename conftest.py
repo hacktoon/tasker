@@ -32,10 +32,10 @@ def good_pokeapi():
 
 
 @pytest.fixture(scope='session')
-def good_fsapi():
+def bad_pokeapi():
     pipeline = Pipeline()
     @pipeline.setup(basetask=HTTPTask)
-    class GoodPokeApi:
+    class BadPokeApi:
         def __init__(self):
             self.client = HTTPClient('PokeAPI', 'https://pokeapi.co/api/v2/')
 
@@ -43,11 +43,22 @@ def good_fsapi():
         def ditto(self, prev_result):
             return self.client.get(f'pokemon/ditto')
 
-        @pipeline.task(name="GET Pikachu")
+        @pipeline.task(name="GET wrong URL")
         def pikachu(self, prev_result):
-            return self.client.get('pokemon/pikachu')
+            return self.client.get('pokemon/p')
 
         @pipeline.task(basetask=Task)
+        def read_disc(self, prev_result):
+            return os.listdir('.')
+    return pipeline
+
+
+@pytest.fixture(scope='session')
+def fs_api():
+    pipeline = Pipeline()
+    @pipeline.setup()
+    class FileSystemApi:
+        @pipeline.task()
         def read_disc(self, prev_result):
             return os.listdir('.')
     return pipeline

@@ -35,39 +35,41 @@ class Pipeline:
         if not len(self._task_queue):
             raise PipelineSetupError('No tasks to run.')
 
-        results = []
-        failed_results = []
+        successful = []
+        failed = []
         previous_result = None
         for task in self._task_queue:
             result = task.run(previous_result)
             if result:
-                results.append(result)
+                successful.append(result)
             else:
-                failed_results.append(result)
+                failed.append(result)
                 break
             previous_result = result
-        return PipelineResult(results, failed_results)
+        return PipelineResult(successful, failed)
 
 
 class PipelineResult:
-    def __init__(self, results, failed_results):
-        self._results = results
-        self._failed_results = failed_results
+    def __init__(self, successful, failed):
+        self._successful = successful
+        self._failed = failed
 
     def __bool__(self):
-        return len(self._failed_results) == 0
+        one_or_more_valid = len(self._successful) > 0
+        zero_failed = len(self._failed) == 0
+        return one_or_more_valid and zero_failed
 
     def __getitem__(self, index):
-        return self._results[index]
+        return self._successful[index]
 
     def __len__(self):
-        return len(self._results)
+        return len(self._successful)
 
     def values(self):
-        return [result.value for result in self._results]
+        return [result.value for result in self._successful]
 
     def failed(self):
-        return [result.value for result in self._failed_results]
+        return self._failed
 
 
 class PipelineSetupError(Exception):
