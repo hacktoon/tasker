@@ -26,7 +26,7 @@ class Task:
         return value
 
     def __str__(self):
-        return f'[TASK] "{self.name}"'
+        return f'Task name="{self.name}"'
 
 
 class TaskResult:
