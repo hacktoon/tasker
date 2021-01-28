@@ -36,8 +36,8 @@ class TaskResult:
         self.status = status
 
     def __bool__(self):
-        return self.status
+        return bool(self.status)
 
     def __str__(self):
-        status = 'OK' if self.status else 'FAILED'
+        status = 'OK' if self else 'FAILED'
         return f'[{status}] task="{self.name}", value="{self.value}"'
