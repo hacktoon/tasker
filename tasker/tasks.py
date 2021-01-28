@@ -6,7 +6,7 @@ class Task:
 
     def run(self, host_self, prev_result=None):
         base_value = prev_result.value if prev_result else None
-        # self.function is an unbound method so it needs an instance ref `self`
+        # self.function is an unbound method so it needs a `self`
         value = self.function(host_self, self.before(base_value))
         status = self.validate(value)
         if status:

@@ -34,3 +34,9 @@ def test_bad_pipeline_failed_results(bad_pokeapi):
 def test_filesystem(fs_api):
     result = fs_api.run()
     assert result
+
+
+def test_value_chain_sum(previous_sum_pipeline):
+    result = previous_sum_pipeline.run()
+    assert bool(result)
+    assert result.values() == [1, 3, 6]

@@ -64,7 +64,11 @@ class PipelineResult:
         return len(self._passed)
 
     def values(self):
-        return [result.value for result in self._passed]
+        return [task.value for task in self._passed]
 
     def failed(self):
         return self._failed
+
+    def __str__(self):
+        status = 'passed' if bool(self) else 'failed'
+        return f'Pipeline passed="{len(self)}" status="{status}"'
