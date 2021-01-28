@@ -1,11 +1,11 @@
 
 class Task:
-    def __init__(self, name, host_method):
+    def __init__(self, name, function):
         self.name = name
-        self.host_method = host_method
+        self.function = function
 
-    def run(self, prev_result=None):
-        value = self.host_method(prev_result)
+    def run(self, host_self, prev_result=None):
+        value = self.function(host_self, prev_result)
         status = self.is_valid(value)
         if status:
             value = self.process_value(value)
