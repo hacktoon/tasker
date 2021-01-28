@@ -6,10 +6,10 @@ from tasker.tasks import Task
 
 
 class HTTPTask(Task):
-    def is_valid(self, response):
+    def validate(self, response):
         return response.valid
 
-    def process_value(self, response):
+    def after(self, response):
         return response.url
 
 

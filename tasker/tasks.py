@@ -5,18 +5,24 @@ class Task:
         self.function = function
 
     def run(self, host_self, prev_result=None):
-        value = self.function(host_self, prev_result)
-        status = self.is_valid(value)
+        base_value = prev_result.value if prev_result else None
+        # self.function is an unbound method so it needs an instance ref `self`
+        value = self.function(host_self, self.before(base_value))
+        status = self.validate(value)
         if status:
-            value = self.process_value(value)
+            value = self.after(value)
         return TaskResult(self.name, value, status)
 
-    def is_valid(self, value):
+    def validate(self, value):
         # overwrite this to add custom validation
         return value is not None or bool(value)
 
-    def process_value(self, value):
+    def after(self, value):
         # overwrite this to process the value returned by task
+        return value
+
+    def before(self, value):
+        # overwrite this to pre-process the task value
         return value
 
     def __str__(self):
